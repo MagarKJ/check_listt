@@ -24,9 +24,7 @@ class CheckListRepoImpl implements CheckListRepo {
         updatedAt: checkList.updatedAt,
       );
 
-      await db
-          .into(db.checklistTable)
-          .insertOnConflictUpdate(checkListRow);
+      await db.into(db.checklistTable).insertOnConflictUpdate(checkListRow);
       return right('Checklist created successfully');
     } catch (e) {
       return left(e.toString());
@@ -34,22 +32,74 @@ class CheckListRepoImpl implements CheckListRepo {
   }
 
   @override
+  EitherFutureData<String> updateCheckList({
+    required ChecklistModel checkList,
+  }) async {
+    try {
+      final checkListRow = ChecklistTableCompanion(
+        name: Value(checkList.name),
+        description: Value(checkList.description),
+        updatedAt: Value(checkList.updatedAt),
+      );
+      await (db.update(
+        db.checklistTable,
+      )..where((t) => t.id.equals(checkList.id))).write(checkListRow);
+
+      return right('Checklist updated successfully');
+    } catch (e) {
+      return left(e.toString());
+    }
+  }
+
+  @override
+  EitherFutureData<String> deleteCheckList({
+    required String checkListId,
+  }) async {
+    try {
+      await (db.delete(
+        db.checklistTable,
+      )..where((t) => t.id.equals(checkListId))).go();
+      return right('Checklist deleted successfully');
+    } catch (e) {
+      return left(e.toString());
+    }
+  }
+
+  @override
   Stream<List<ChecklistModel>> getCheckListsStream() {
-    return db
-        .select(db.checklistTable)
-        .watch()
-        .map(
-          (rows) => rows
-              .map(
-                (row) => ChecklistModel(
-                  id: row.id,
-                  name: row.name,
-                  description: row.description,
-                  createdAt: row.createdAt,
-                  updatedAt: row.updatedAt,
-                ),
-              )
-              .toList(),
+    final c = db.checklistTable;
+    final i = db.checkListItemsTable;
+
+    final totalExpr = i.id.count();
+    final completedExpr = i.id.count(filter: i.isChecked.equals(true));
+
+    final q =
+        db.select(c).join([leftOuterJoin(i, i.checkListId.equalsExp(c.id))])
+          ..addColumns([totalExpr, completedExpr])
+          ..groupBy([c.id])
+          ..orderBy([
+            OrderingTerm(
+              expression: c.updatedAt,
+              mode: OrderingMode.asc, // newest first
+            ),
+          ]);
+
+    return q.watch().map((rows) {
+      return rows.map((r) {
+        final checklist = r.readTable(c);
+
+        final total = r.read(totalExpr) ?? 0;
+        final completed = r.read(completedExpr) ?? 0;
+
+        return ChecklistModel(
+          id: checklist.id,
+          name: checklist.name,
+          progress: (completed, total),
+          description: checklist.description,
+          createdAt: checklist.createdAt,
+          updatedAt: checklist.updatedAt,
         );
+      }).toList();
+    });
   }
 }

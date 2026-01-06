@@ -6,12 +6,9 @@ import 'package:flutter/rendering.dart';
 class AnimatedFab extends StatefulWidget {
   final ScrollController? scrollController;
   final void Function()? onTap;
+  final String? label;
 
-  const AnimatedFab({
-    super.key,
-    this.scrollController,
-    this.onTap,
-  });
+  const AnimatedFab({super.key, this.scrollController, this.onTap, this.label});
 
   @override
   State<AnimatedFab> createState() => _AnimatedFabState();
@@ -27,9 +24,7 @@ class _AnimatedFabState extends State<AnimatedFab> {
             ScrollDirection.reverse &&
         _isExpanded) {
       _isExpanded = !_isExpanded;
-    } else if (_scrollController
-                .position
-                .userScrollDirection ==
+    } else if (_scrollController.position.userScrollDirection ==
             ScrollDirection.forward &&
         !_isExpanded) {
       _isExpanded = !_isExpanded;
@@ -39,8 +34,7 @@ class _AnimatedFabState extends State<AnimatedFab> {
 
   @override
   void initState() {
-    _scrollController =
-        widget.scrollController ?? ScrollController();
+    _scrollController = widget.scrollController ?? ScrollController();
     _scrollController.addListener(_onScrollDirection);
     super.initState();
   }
@@ -67,9 +61,7 @@ class _AnimatedFabState extends State<AnimatedFab> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
           color: Colors.blueAccent,
-          border: Border.all(
-            color: Colors.grey.withOpasityX(opasity: .6),
-          ),
+          border: Border.all(color: Colors.grey.withOpasityX(opasity: .6)),
           boxShadow: const [
             BoxShadow(
               color: Color(0x1E000000),
@@ -85,25 +77,20 @@ class _AnimatedFabState extends State<AnimatedFab> {
             const Positioned(
               top: position,
               left: position,
-              child: Icon(
-                Icons.add,
-                size: _iconSize,
-                color: Colors.white,
-              ),
+              child: Icon(Icons.add, size: _iconSize, color: Colors.white),
             ),
             Positioned(
               top: position - .23 * _iconSize,
               left: position + 2 * _iconSize,
               child: WidgetSize(
                 onChange: (size) {
-                  _labelWidth =
-                      (size?.width ?? 0) + _minSize + 14;
+                  _labelWidth = (size?.width ?? 0) + _minSize + 14;
                   setState(() {});
                 },
-                child: const Center(
+                child: Center(
                   child: Text(
-                    'Create New Checklist',
-                    style: TextStyle(
+                    widget.label ?? 'Add Checklist',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,

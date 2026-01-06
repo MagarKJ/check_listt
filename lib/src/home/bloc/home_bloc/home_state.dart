@@ -6,10 +6,16 @@ abstract class HomeState with _$HomeState {
     required String message,
     required LoadingStatus checkListStatus,
     required List<ChecklistModel> checklists,
+
+    //
+    required bool isGridView,
   }) = _HomeState;
   factory HomeState.initial() => const HomeState(
     message: '',
     checkListStatus: LoadingStatus.initial,
     checklists: [],
+
+    //
+    isGridView: false,
   );
 }
