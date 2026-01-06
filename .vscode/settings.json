@@ -1,0 +1,10 @@
+{
+  "cmake.configureOnOpen": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.removeUnusedImports": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "postman.settings.dotenv-detection-notification-visibility": false,
+  "java.configuration.updateBuildConfiguration": "interactive"
+}

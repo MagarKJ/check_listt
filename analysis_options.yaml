@@ -1,0 +1,63 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    - avoid_print
+    - prefer_single_quotes
+    - always_use_package_imports
+    - parameter_assignments
+    - avoid_empty_else
+    - avoid_relative_lib_imports
+    - control_flow_in_finally
+    - collection_methods_unrelated_type
+    - empty_statements
+    - hash_and_equals
+    - no_duplicate_case_values
+    - valid_regexps
+    - annotate_overrides
+    - avoid_init_to_null
+    - avoid_null_checks_in_equality_operators
+    - avoid_returning_null_for_void
+    - await_only_futures
+    - camel_case_extensions
+    - camel_case_types
+    - prefer_conditional_assignment
+    - recursive_getters
+    - use_decorated_box
+    - use_colored_box
+    - prefer_for_elements_to_map_fromIterable
+    - sort_child_properties_last
+    - use_rethrow_when_possible
+    - use_super_parameters
+    #  // name of Lint: use_build_context_synchronously :
+    # Description: When a BuildContext is used, its mounted property must be checked after an asynchronous gap.
+    # Bad Practice:
+    # void onButtonTapped(BuildContext context) async {
+    # await Future.delayed(const Duration(seconds: 1));
+    # Navigator.of(context).pop();
+    # }
+    # Good practice:
+    # 1.
+    # void onButtonTapped(BuildContext context) {
+    # Navigator.of(context).pop();
+    # }
+    # 2.
+    # void onButtonTapped() async {
+    # await Future.delayed(const Duration(seconds: 1));
+
+    # if (!context.mounted) return;
+    # Navigator.of(context).pop();
+    # }
+    - use_build_context_synchronously
+
+    #These rules were added inorder to get warning to add const 
+    - prefer_const_constructors
+    - prefer_const_literals_to_create_immutables
+    - prefer_const_declarations
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+  errors:
+    invalid_annotation_target: ignore
