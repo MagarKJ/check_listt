@@ -15,7 +15,9 @@ import 'package:check_list/src/widgets/custom_progress_indicator.dart';
 import 'package:check_list/src/widgets/custom_snack.dart';
 import 'package:check_list/src/widgets/delete_dialog_box.dart';
 import 'package:check_list/src/widgets/pop_button.dart';
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 @RoutePage()
@@ -47,16 +49,21 @@ class CheckListDetailsScreen extends StatefulWidget
 
 class _CheckListDetailsScreenState extends State<CheckListDetailsScreen> {
   late final ScrollController _scrollController;
+  late final ConfettiController _confettiController;
 
   @override
   void initState() {
     _scrollController = ScrollController();
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 1),
+    );
     super.initState();
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _confettiController.dispose();
     super.dispose();
   }
 
@@ -117,6 +124,7 @@ class _CheckListDetailsScreenState extends State<CheckListDetailsScreen> {
               current.updateCheckListItemCheckStatus,
           listener: (context, state) {
             state.updateCheckListItemCheckStatus.listenWhen(
+              success: () => _confettiController.play(),
               failure: () {
                 context.pop();
                 Snack.error(context, state.message);
@@ -160,50 +168,67 @@ class _CheckListDetailsScreenState extends State<CheckListDetailsScreen> {
           leading: Row(children: [14.horizontalSpace, const PopButton()]),
           leadingWidth: 60,
         ),
-        body: Column(
-          crossAxisAlignment: .start,
+        body: Stack(
           children: [
-            const Text(
-              'Progress',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
-            ).paddingX(padding: const EdgeInsets.symmetric(horizontal: 20)),
-            10.verticalSpace,
-            BlocSelector<CheckListItemBloc, CheckListItemState, (int, int)>(
-              selector: (state) => state.completedTasks,
-              builder: (context, completedTasks) {
-                return Column(
-                  crossAxisAlignment: .start,
-                  children: [
-                    Text(
-                      '${completedTasks.$1} of ${completedTasks.$2} items completed',
-                      style: const TextStyle(color: Colors.grey, fontSize: 16),
-                    ),
-                    10.verticalSpace,
-                    CustomLinearProgressIndicator(progress: completedTasks),
-                    20.verticalSpace,
-                  ],
-                );
-              },
-            ).paddingX(padding: const EdgeInsets.symmetric(horizontal: 20)),
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConfettiWidget(
+                confettiController: _confettiController,
+                blastDirectionality: BlastDirectionality.explosive,
+                numberOfParticles: 30,
+                gravity: 0.3,
+              ),
+            ),
+            Column(
+              crossAxisAlignment: .start,
+              children: [
+                const Text(
+                  'Progress',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
+                ).paddingX(padding: const EdgeInsets.symmetric(horizontal: 20)),
+                10.verticalSpace,
+                BlocSelector<CheckListItemBloc, CheckListItemState, (int, int)>(
+                  selector: (state) => state.completedTasks,
+                  builder: (context, completedTasks) {
+                    return Column(
+                      crossAxisAlignment: .start,
+                      children: [
+                        Text(
+                          '${completedTasks.$1} of ${completedTasks.$2} items completed',
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 16,
+                          ),
+                        ),
+                        10.verticalSpace,
+                        CustomLinearProgressIndicator(progress: completedTasks),
+                        20.verticalSpace,
+                      ],
+                    );
+                  },
+                ).paddingX(padding: const EdgeInsets.symmetric(horizontal: 20)),
 
-            BlocBuilder<CheckListItemBloc, CheckListItemState>(
-              buildWhen: (previous, current) =>
-                  previous.checkListItemStatus != current.checkListItemStatus ||
-                  previous.checkListItems != current.checkListItems,
-              builder: (context, state) {
-                return Expanded(
-                  child: ListView.separated(
-                    itemCount: state.checkListItems.length,
-                    controller: _scrollController,
-                    separatorBuilder: (_, _) => 10.verticalSpace,
-                    itemBuilder: (context, index) {
-                      return _CheckListItem(
-                        checkListItem: state.checkListItems[index],
-                      );
-                    },
-                  ),
-                );
-              },
+                BlocBuilder<CheckListItemBloc, CheckListItemState>(
+                  buildWhen: (previous, current) =>
+                      previous.checkListItemStatus !=
+                          current.checkListItemStatus ||
+                      previous.checkListItems != current.checkListItems,
+                  builder: (context, state) {
+                    return Expanded(
+                      child: ListView.separated(
+                        itemCount: state.checkListItems.length,
+                        controller: _scrollController,
+                        separatorBuilder: (_, _) => 10.verticalSpace,
+                        itemBuilder: (context, index) {
+                          return _CheckListItem(
+                            checkListItem: state.checkListItems[index],
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
           ],
         ),
@@ -258,6 +283,7 @@ class _CheckListItem extends StatelessWidget {
             Checkbox.adaptive(
               value: checkListItem.isChecked,
               onChanged: (value) {
+                HapticFeedback.selectionClick();
                 context
                     .read<CreateCheckListItemCubit>()
                     .updateCheckListItemCheck(

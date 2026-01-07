@@ -26,6 +26,7 @@ dependencies:
   bloc_concurrency: ^0.3.0
   uuid: ^4.5.2
   intl: ^0.20.2
+  confetti: ^0.8.0
 
 dev_dependencies:
   flutter_test:
