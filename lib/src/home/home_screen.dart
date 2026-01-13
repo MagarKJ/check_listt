@@ -10,6 +10,7 @@ import 'package:check_list/src/home/create_new_checklist.dart';
 import 'package:check_list/src/home/data/model/checklist_model.dart';
 import 'package:check_list/src/widgets/animated_fab.dart';
 import 'package:check_list/src/widgets/custom_divider.dart';
+import 'package:check_list/src/widgets/empty_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -114,7 +115,23 @@ class _HomeScreenState extends State<HomeScreen> {
                     loading: () => const Text('loading'),
                     success: () {
                       return state.checklists.isEmpty
-                          ? const Text('No Checklists')
+                          ? EmptyWidget(
+                              onTap: () {
+                                context.openBottomSheet(
+                                  child:
+                                      BlocProvider<
+                                        CreateNewChecklistCubit
+                                      >.value(
+                                        value: context
+                                            .read<
+                                              CreateNewChecklistCubit
+                                            >(),
+                                        child:
+                                            const CreateNewChecklistScreen(),
+                                      ),
+                                );
+                              },
+                            )
                           : ListView.separated(
                               itemCount:
                                   state.checklists.length,
