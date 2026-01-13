@@ -30,7 +30,7 @@ class EmptyWidget extends StatelessWidget {
           ),
           CustomButton(
             onTap: onTap,
-            buttonText: 'Create Check List',
+            label: 'Create Check List',
           ),
         ],
       ).paddingX(padding: const .symmetric(horizontal: 25)),

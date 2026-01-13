@@ -55,11 +55,12 @@ extension HomeEventPatterns on HomeEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _WatchCheckListData value)?  watchCheckListData,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _WatchCheckListData value)?  watchCheckListData,TResult Function( _ChangeView value)?  changeView,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _WatchCheckListData() when watchCheckListData != null:
-return watchCheckListData(_that);case _:
+return watchCheckListData(_that);case _ChangeView() when changeView != null:
+return changeView(_that);case _:
   return orElse();
 
 }
@@ -77,11 +78,12 @@ return watchCheckListData(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _WatchCheckListData value)  watchCheckListData,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _WatchCheckListData value)  watchCheckListData,required TResult Function( _ChangeView value)  changeView,}){
 final _that = this;
 switch (_that) {
 case _WatchCheckListData():
-return watchCheckListData(_that);case _:
+return watchCheckListData(_that);case _ChangeView():
+return changeView(_that);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -98,11 +100,12 @@ return watchCheckListData(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _WatchCheckListData value)?  watchCheckListData,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _WatchCheckListData value)?  watchCheckListData,TResult? Function( _ChangeView value)?  changeView,}){
 final _that = this;
 switch (_that) {
 case _WatchCheckListData() when watchCheckListData != null:
-return watchCheckListData(_that);case _:
+return watchCheckListData(_that);case _ChangeView() when changeView != null:
+return changeView(_that);case _:
   return null;
 
 }
@@ -119,10 +122,11 @@ return watchCheckListData(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  watchCheckListData,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  watchCheckListData,TResult Function()?  changeView,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _WatchCheckListData() when watchCheckListData != null:
-return watchCheckListData();case _:
+return watchCheckListData();case _ChangeView() when changeView != null:
+return changeView();case _:
   return orElse();
 
 }
@@ -140,10 +144,11 @@ return watchCheckListData();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  watchCheckListData,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  watchCheckListData,required TResult Function()  changeView,}) {final _that = this;
 switch (_that) {
 case _WatchCheckListData():
-return watchCheckListData();case _:
+return watchCheckListData();case _ChangeView():
+return changeView();case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -160,10 +165,11 @@ return watchCheckListData();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  watchCheckListData,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  watchCheckListData,TResult? Function()?  changeView,}) {final _that = this;
 switch (_that) {
 case _WatchCheckListData() when watchCheckListData != null:
-return watchCheckListData();case _:
+return watchCheckListData();case _ChangeView() when changeView != null:
+return changeView();case _:
   return null;
 
 }
@@ -204,9 +210,42 @@ String toString() {
 
 
 /// @nodoc
+
+
+class _ChangeView implements HomeEvent {
+  const _ChangeView();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChangeView);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'HomeEvent.changeView()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
 mixin _$HomeState {
 
- String get message; LoadingStatus get checkListStatus; List<ChecklistModel> get checklists;
+ String get message; LoadingStatus get checkListStatus; List<ChecklistModel> get checklists;//
+ bool get isGridView;
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -217,16 +256,16 @@ $HomeStateCopyWith<HomeState> get copyWith => _$HomeStateCopyWithImpl<HomeState>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeState&&(identical(other.message, message) || other.message == message)&&(identical(other.checkListStatus, checkListStatus) || other.checkListStatus == checkListStatus)&&const DeepCollectionEquality().equals(other.checklists, checklists));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeState&&(identical(other.message, message) || other.message == message)&&(identical(other.checkListStatus, checkListStatus) || other.checkListStatus == checkListStatus)&&const DeepCollectionEquality().equals(other.checklists, checklists)&&(identical(other.isGridView, isGridView) || other.isGridView == isGridView));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,message,checkListStatus,const DeepCollectionEquality().hash(checklists));
+int get hashCode => Object.hash(runtimeType,message,checkListStatus,const DeepCollectionEquality().hash(checklists),isGridView);
 
 @override
 String toString() {
-  return 'HomeState(message: $message, checkListStatus: $checkListStatus, checklists: $checklists)';
+  return 'HomeState(message: $message, checkListStatus: $checkListStatus, checklists: $checklists, isGridView: $isGridView)';
 }
 
 
@@ -237,7 +276,7 @@ abstract mixin class $HomeStateCopyWith<$Res>  {
   factory $HomeStateCopyWith(HomeState value, $Res Function(HomeState) _then) = _$HomeStateCopyWithImpl;
 @useResult
 $Res call({
- String message, LoadingStatus checkListStatus, List<ChecklistModel> checklists
+ String message, LoadingStatus checkListStatus, List<ChecklistModel> checklists, bool isGridView
 });
 
 
@@ -254,12 +293,13 @@ class _$HomeStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? message = null,Object? checkListStatus = null,Object? checklists = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? message = null,Object? checkListStatus = null,Object? checklists = null,Object? isGridView = null,}) {
   return _then(_self.copyWith(
 message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,checkListStatus: null == checkListStatus ? _self.checkListStatus : checkListStatus // ignore: cast_nullable_to_non_nullable
 as LoadingStatus,checklists: null == checklists ? _self.checklists : checklists // ignore: cast_nullable_to_non_nullable
-as List<ChecklistModel>,
+as List<ChecklistModel>,isGridView: null == isGridView ? _self.isGridView : isGridView // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -344,10 +384,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String message,  LoadingStatus checkListStatus,  List<ChecklistModel> checklists)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String message,  LoadingStatus checkListStatus,  List<ChecklistModel> checklists,  bool isGridView)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HomeState() when $default != null:
-return $default(_that.message,_that.checkListStatus,_that.checklists);case _:
+return $default(_that.message,_that.checkListStatus,_that.checklists,_that.isGridView);case _:
   return orElse();
 
 }
@@ -365,10 +405,10 @@ return $default(_that.message,_that.checkListStatus,_that.checklists);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String message,  LoadingStatus checkListStatus,  List<ChecklistModel> checklists)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String message,  LoadingStatus checkListStatus,  List<ChecklistModel> checklists,  bool isGridView)  $default,) {final _that = this;
 switch (_that) {
 case _HomeState():
-return $default(_that.message,_that.checkListStatus,_that.checklists);case _:
+return $default(_that.message,_that.checkListStatus,_that.checklists,_that.isGridView);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -385,10 +425,10 @@ return $default(_that.message,_that.checkListStatus,_that.checklists);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String message,  LoadingStatus checkListStatus,  List<ChecklistModel> checklists)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String message,  LoadingStatus checkListStatus,  List<ChecklistModel> checklists,  bool isGridView)?  $default,) {final _that = this;
 switch (_that) {
 case _HomeState() when $default != null:
-return $default(_that.message,_that.checkListStatus,_that.checklists);case _:
+return $default(_that.message,_that.checkListStatus,_that.checklists,_that.isGridView);case _:
   return null;
 
 }
@@ -400,7 +440,7 @@ return $default(_that.message,_that.checkListStatus,_that.checklists);case _:
 
 
 class _HomeState implements HomeState {
-  const _HomeState({required this.message, required this.checkListStatus, required final  List<ChecklistModel> checklists}): _checklists = checklists;
+  const _HomeState({required this.message, required this.checkListStatus, required final  List<ChecklistModel> checklists, required this.isGridView}): _checklists = checklists;
   
 
 @override final  String message;
@@ -412,6 +452,8 @@ class _HomeState implements HomeState {
   return EqualUnmodifiableListView(_checklists);
 }
 
+//
+@override final  bool isGridView;
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
@@ -423,16 +465,16 @@ _$HomeStateCopyWith<_HomeState> get copyWith => __$HomeStateCopyWithImpl<_HomeSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeState&&(identical(other.message, message) || other.message == message)&&(identical(other.checkListStatus, checkListStatus) || other.checkListStatus == checkListStatus)&&const DeepCollectionEquality().equals(other._checklists, _checklists));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeState&&(identical(other.message, message) || other.message == message)&&(identical(other.checkListStatus, checkListStatus) || other.checkListStatus == checkListStatus)&&const DeepCollectionEquality().equals(other._checklists, _checklists)&&(identical(other.isGridView, isGridView) || other.isGridView == isGridView));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,message,checkListStatus,const DeepCollectionEquality().hash(_checklists));
+int get hashCode => Object.hash(runtimeType,message,checkListStatus,const DeepCollectionEquality().hash(_checklists),isGridView);
 
 @override
 String toString() {
-  return 'HomeState(message: $message, checkListStatus: $checkListStatus, checklists: $checklists)';
+  return 'HomeState(message: $message, checkListStatus: $checkListStatus, checklists: $checklists, isGridView: $isGridView)';
 }
 
 
@@ -443,7 +485,7 @@ abstract mixin class _$HomeStateCopyWith<$Res> implements $HomeStateCopyWith<$Re
   factory _$HomeStateCopyWith(_HomeState value, $Res Function(_HomeState) _then) = __$HomeStateCopyWithImpl;
 @override @useResult
 $Res call({
- String message, LoadingStatus checkListStatus, List<ChecklistModel> checklists
+ String message, LoadingStatus checkListStatus, List<ChecklistModel> checklists, bool isGridView
 });
 
 
@@ -460,12 +502,13 @@ class __$HomeStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? checkListStatus = null,Object? checklists = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? checkListStatus = null,Object? checklists = null,Object? isGridView = null,}) {
   return _then(_HomeState(
 message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,checkListStatus: null == checkListStatus ? _self.checkListStatus : checkListStatus // ignore: cast_nullable_to_non_nullable
 as LoadingStatus,checklists: null == checklists ? _self._checklists : checklists // ignore: cast_nullable_to_non_nullable
-as List<ChecklistModel>,
+as List<ChecklistModel>,isGridView: null == isGridView ? _self.isGridView : isGridView // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

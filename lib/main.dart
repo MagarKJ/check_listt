@@ -29,8 +29,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
 
-      routeInformationParser: _appRouter
-          .defaultRouteParser(),
+      routeInformationParser: _appRouter.defaultRouteParser(),
       routerDelegate: AutoRouterDelegate(_appRouter),
     );
   }

@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:check_list/core/database/pretty_sql_interceptor.dart';
+import 'package:check_list/src/check_list_details/data/model/check_list_items_table.dart';
 import 'package:check_list/src/home/data/model/checklist_table.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
@@ -12,20 +14,19 @@ part 'app_database.g.dart';
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dir = await getApplicationDocumentsDirectory();
-    final file = File(
-      p.join(dir.path, 'check_list.sqlite'),
-    );
-    return NativeDatabase.createBackgroundConnection(file);
+    final file = File(p.join(dir.path, 'check_list.sqlite'));
+    return NativeDatabase.createBackgroundConnection(file)
+      ..interceptWith(PrettySqlInterceptor());
   });
 }
 
 @lazySingleton
-@DriftDatabase(tables: [ChecklistTable])
+@DriftDatabase(tables: [ChecklistTable, CheckListItemsTable])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
