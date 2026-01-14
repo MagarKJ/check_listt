@@ -12,4 +12,6 @@ abstract class CheckListRepo {
   EitherFutureData<String> deleteCheckList({required String checkListId});
 
   Stream<List<ChecklistModel>> getCheckListsStream();
+
+  EitherFutureData<String> completeAllTasks({required String checkListId});
 }

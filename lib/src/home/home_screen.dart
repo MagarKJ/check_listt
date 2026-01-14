@@ -20,27 +20,22 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 @RoutePage()
-class HomeScreen extends StatefulWidget
-    implements AutoRouteWrapper {
+class HomeScreen extends StatefulWidget implements AutoRouteWrapper {
   const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 
   @override
-  Widget wrappedRoute(BuildContext context) =>
-      MultiBlocProvider(
-        providers: [
-          BlocProvider<HomeBloc>(
-            create: (_) => HomeBloc()
-              ..add(const HomeEvent.watchCheckListData()),
-          ),
-          BlocProvider<CreateChecklistCubit>(
-            create: (_) => CreateChecklistCubit(),
-          ),
-        ],
-        child: this,
-      );
+  Widget wrappedRoute(BuildContext context) => MultiBlocProvider(
+    providers: [
+      BlocProvider<HomeBloc>(
+        create: (_) => HomeBloc()..add(const HomeEvent.watchCheckListData()),
+      ),
+      BlocProvider<CreateChecklistCubit>(create: (_) => CreateChecklistCubit()),
+    ],
+    child: this,
+  );
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -61,10 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return MultiBlocListener(
       listeners: [
-        BlocListener<
-          CreateChecklistCubit,
-          CreateChecklistState
-        >(
+        BlocListener<CreateChecklistCubit, CreateChecklistState>(
           listenWhen: (previous, current) =>
               previous.createNewCheckListStatus !=
               current.createNewCheckListStatus,
@@ -81,13 +73,9 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           },
         ),
-        BlocListener<
-          CreateChecklistCubit,
-          CreateChecklistState
-        >(
+        BlocListener<CreateChecklistCubit, CreateChecklistState>(
           listenWhen: (previous, current) =>
-              previous.deleteCheckListStatus !=
-              current.deleteCheckListStatus,
+              previous.deleteCheckListStatus != current.deleteCheckListStatus,
           listener: (context, state) {
             state.deleteCheckListStatus.listenWhen(
               success: () {
@@ -102,17 +90,29 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           },
         ),
-        BlocListener<
-          CreateChecklistCubit,
-          CreateChecklistState
-        >(
+        BlocListener<CreateChecklistCubit, CreateChecklistState>(
           listenWhen: (previous, current) =>
-              previous.upadeCheckListStatus !=
-              current.upadeCheckListStatus,
+              previous.upadeCheckListStatus != current.upadeCheckListStatus,
           listener: (context, state) {
             state.upadeCheckListStatus.listenWhen(
               success: () {
                 context.pop();
+                context.pop();
+                Snack.success(context, state.message);
+              },
+              failure: () {
+                context.pop();
+                Snack.error(context, state.message);
+              },
+            );
+          },
+        ),
+        BlocListener<HomeBloc, HomeState>(
+          listenWhen: (previous, current) =>
+              previous.completeAllTasksStatus != current.completeAllTasksStatus,
+          listener: (context, state) {
+            state.completeAllTasksStatus.listenWhen(
+              success: () {
                 context.pop();
                 Snack.success(context, state.message);
               },
@@ -130,8 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: () => context.openBottomSheet(
             isDismissible: false,
             child: BlocProvider<CreateChecklistCubit>.value(
-              value: context.read<CreateChecklistCubit>()
-                ..reset(),
+              value: context.read<CreateChecklistCubit>()..reset(),
               child: const CreateChecklist(),
             ),
           ),
@@ -162,26 +161,15 @@ class _HomeScreenState extends State<HomeScreen> {
             const CustomDivider(),
             const Text(
               'My Checklists',
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-              ),
-            ).paddingX(
-              padding: const EdgeInsets.only(
-                left: 25,
-                bottom: 15,
-              ),
-            ),
+              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+            ).paddingX(padding: const EdgeInsets.only(left: 25, bottom: 15)),
             15.verticalSpace,
             Expanded(
               child: BlocBuilder<HomeBloc, HomeState>(
                 buildWhen: (previous, current) =>
-                    previous.checklists !=
-                        current.checklists ||
-                    previous.checkListStatus !=
-                        current.checkListStatus ||
-                    previous.isGridView !=
-                        current.isGridView,
+                    previous.checklists != current.checklists ||
+                    previous.checkListStatus != current.checkListStatus ||
+                    previous.isGridView != current.isGridView,
                 builder: (context, state) {
                   return state.checkListStatus.when(
                     loading: () => const Text('loading'),
@@ -191,13 +179,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       } else {
                         if (state.isGridView) {
                           return GridView.builder(
-                            itemCount:
-                                state.checklists.length,
+                            itemCount: state.checklists.length,
                             controller: _scrollController,
-                            padding:
-                                const EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                ),
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 2,
@@ -207,22 +191,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                             itemBuilder: (context, index) {
                               return _CheckGridItem(
-                                checkList:
-                                    state.checklists[index],
+                                checkList: state.checklists[index],
                               );
                             },
                           );
                         } else {
                           return ListView.separated(
-                            itemCount:
-                                state.checklists.length,
+                            itemCount: state.checklists.length,
                             controller: _scrollController,
                             separatorBuilder: (_, _) =>
                                 const SizedBox(height: 15),
                             itemBuilder: (context, index) {
                               return _CheckListItem(
-                                checkList:
-                                    state.checklists[index],
+                                checkList: state.checklists[index],
                               );
                             },
                           );
@@ -248,38 +229,31 @@ class _CheckListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.router.push(
-        CheckListDetailsRoute(checkList: checkList),
-      ),
+      onTap: () =>
+          context.router.push(CheckListDetailsRoute(checkList: checkList)),
       onLongPress: () => context.openBottomSheet(
         child: BlocProvider<CreateChecklistCubit>.value(
           value: context.read<CreateChecklistCubit>(),
           child: ActionsBottomSheet(
+            onMarkAsCompletedTap: () => context.read<HomeBloc>().add(
+              HomeEvent.completeAllTasks(checkListId: checkList.id),
+            ),
             onEditTap: () => context.openBottomSheet(
               isDismissible: false,
-              child:
-                  BlocProvider<CreateChecklistCubit>.value(
-                    value:
-                        context.read<CreateChecklistCubit>()
-                          ..onNameChanged(
-                            checkListName: checkList.name,
-                          )
-                          ..onDescriptionChanged(
-                            description:
-                                checkList.description ?? '',
-                          ),
-                    child: CreateChecklist.update(
-                      checkListId: checkList.id,
-                    ),
+              child: BlocProvider<CreateChecklistCubit>.value(
+                value: context.read<CreateChecklistCubit>()
+                  ..onNameChanged(checkListName: checkList.name)
+                  ..onDescriptionChanged(
+                    description: checkList.description ?? '',
                   ),
+                child: CreateChecklist.update(checkListId: checkList.id),
+              ),
             ),
             onDeleteTap: () => context.openDialog(
               child: DeleteDialogBox(
                 onDelete: () => context
                     .read<CreateChecklistCubit>()
-                    .deleteCheckList(
-                      checkListId: checkList.id,
-                    ),
+                    .deleteCheckList(checkListId: checkList.id),
               ),
             ),
           ),
@@ -289,16 +263,12 @@ class _CheckListItem extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 25),
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.grey.withOpasityX(opasity: 0.4),
-          ),
+          border: Border.all(color: Colors.grey.withOpasityX(opasity: 0.4)),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
-            CustomCircularProgressIndicator(
-              progress: checkList.progress,
-            ),
+            CustomCircularProgressIndicator(progress: checkList.progress),
             15.horizontalSpace,
             Column(
               crossAxisAlignment: .start,
@@ -306,9 +276,7 @@ class _CheckListItem extends StatelessWidget {
                 Text(checkList.name),
                 Text(
                   '${checkList.progress.$1}/${checkList.progress.$2} Items Completed',
-                  style: const TextStyle(
-                    color: Colors.grey,
-                  ),
+                  style: const TextStyle(color: Colors.grey),
                 ),
               ],
             ),
@@ -328,38 +296,31 @@ class _CheckGridItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.router.push(
-        CheckListDetailsRoute(checkList: checkList),
-      ),
+      onTap: () =>
+          context.router.push(CheckListDetailsRoute(checkList: checkList)),
       onLongPress: () => context.openBottomSheet(
         child: BlocProvider<CreateChecklistCubit>.value(
           value: context.read<CreateChecklistCubit>(),
           child: ActionsBottomSheet(
+            onMarkAsCompletedTap: () => context.read<HomeBloc>().add(
+              HomeEvent.completeAllTasks(checkListId: checkList.id),
+            ),
             onEditTap: () => context.openBottomSheet(
               isDismissible: false,
-              child:
-                  BlocProvider<CreateChecklistCubit>.value(
-                    value:
-                        context.read<CreateChecklistCubit>()
-                          ..onNameChanged(
-                            checkListName: checkList.name,
-                          )
-                          ..onDescriptionChanged(
-                            description:
-                                checkList.description ?? '',
-                          ),
-                    child: CreateChecklist.update(
-                      checkListId: checkList.id,
-                    ),
+              child: BlocProvider<CreateChecklistCubit>.value(
+                value: context.read<CreateChecklistCubit>()
+                  ..onNameChanged(checkListName: checkList.name)
+                  ..onDescriptionChanged(
+                    description: checkList.description ?? '',
                   ),
+                child: CreateChecklist.update(checkListId: checkList.id),
+              ),
             ),
             onDeleteTap: () => context.openDialog(
               child: DeleteDialogBox(
                 onDelete: () => context
                     .read<CreateChecklistCubit>()
-                    .deleteCheckList(
-                      checkListId: checkList.id,
-                    ),
+                    .deleteCheckList(checkListId: checkList.id),
               ),
             ),
           ),
@@ -368,9 +329,7 @@ class _CheckGridItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.grey.withOpasityX(opasity: 0.4),
-          ),
+          border: Border.all(color: Colors.grey.withOpasityX(opasity: 0.4)),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -381,27 +340,18 @@ class _CheckGridItem extends StatelessWidget {
               child: CustomCircularProgressIndicator(
                 progress: checkList.progress,
                 strokeWidth: 12,
-                constraints: const BoxConstraints(
-                  minHeight: 65,
-                  minWidth: 65,
-                ),
+                constraints: const BoxConstraints(minHeight: 65, minWidth: 65),
               ),
             ),
             20.verticalSpace,
             Text(
               checkList.name,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             5.verticalSpace,
             Text(
               '${checkList.progress.$1}/${checkList.progress.$2} Items',
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.grey.shade600,
-              ),
+              style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
             ),
             5.verticalSpace,
 
@@ -409,10 +359,7 @@ class _CheckGridItem extends StatelessWidget {
               DateFormat(
                 'MMM d, yyyy',
               ).format(DateTime.parse(checkList.updatedAt)),
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade500,
-              ),
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
             ),
           ],
         ),

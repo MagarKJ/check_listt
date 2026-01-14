@@ -17,8 +17,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc()
     : _checkListRepo = sl<CheckListRepo>(),
       super(HomeState.initial()) {
-    on<_ChangeView>(_onChangeView);
     on<_WatchCheckListData>(_onWatchCheckListData, transformer: restartable());
+    on<_ChangeView>(_onChangeView);
+    on<_CompleteAllTasks>(_onCompleteAllTasks);
   }
 
   FutureOr<void> _onWatchCheckListData(
@@ -44,5 +45,35 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   FutureOr<void> _onChangeView(_ChangeView event, Emitter<HomeState> emit) {
     emit(state.copyWith(isGridView: !state.isGridView));
+  }
+
+  FutureOr<void> _onCompleteAllTasks(
+    _CompleteAllTasks event,
+    Emitter<HomeState> emit,
+  ) async {
+    emit(state.copyWith(completeAllTasksStatus: LoadingStatus.loading));
+
+    final result = await _checkListRepo.completeAllTasks(
+      checkListId: event.checkListId,
+    );
+
+    result.fold(
+      (l) {
+        emit(
+          state.copyWith(
+            completeAllTasksStatus: LoadingStatus.failure,
+            message: l,
+          ),
+        );
+      },
+      (r) {
+        emit(
+          state.copyWith(
+            completeAllTasksStatus: LoadingStatus.success,
+            message: r,
+          ),
+        );
+      },
+    );
   }
 }

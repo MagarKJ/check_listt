@@ -102,4 +102,32 @@ class CheckListRepoImpl implements CheckListRepo {
       }).toList();
     });
   }
+
+  @override
+  EitherFutureData<String> completeAllTasks({
+    required String checkListId,
+  }) async {
+    try {
+      final checkListItems = await (db.select(
+        db.checkListItemsTable,
+      )..where((t) => t.checkListId.equals(checkListId))).get();
+
+      if (checkListItems.isEmpty) {
+        return left('There are no tasks to complete');
+      }
+
+      for (final item in checkListItems) {
+        final checkListItemRow = CheckListItemsTableCompanion(
+          isChecked: const Value(true),
+          updatedAt: Value(DateTime.now().toIso8601String()),
+        );
+        await (db.update(
+          db.checkListItemsTable,
+        )..where((t) => t.id.equals(item.id))).write(checkListItemRow);
+      }
+      return right('All tasks completed successfully');
+    } catch (e) {
+      return left(e.toString());
+    }
+  }
 }

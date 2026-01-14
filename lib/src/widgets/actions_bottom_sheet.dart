@@ -4,17 +4,20 @@ import 'package:flutter/material.dart';
 
 class ActionsBottomSheet extends StatelessWidget {
   final void Function() onEditTap, onDeleteTap;
+  final void Function()? onMarkAsCompletedTap;
   final bool isItem;
   const ActionsBottomSheet({
     super.key,
     required this.onEditTap,
     required this.onDeleteTap,
+    required this.onMarkAsCompletedTap,
   }) : isItem = false;
   const ActionsBottomSheet.items({
     super.key,
     required this.onEditTap,
     required this.onDeleteTap,
-  }) : isItem = true;
+  }) : isItem = true,
+       onMarkAsCompletedTap = null;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +38,7 @@ class ActionsBottomSheet extends StatelessWidget {
         if (!isItem) ...[
           _ActionItem(
             label: 'Mark Completed',
-            onTap: () {},
+            onTap: onMarkAsCompletedTap!,
             icon: Icons.checklist_sharp,
           ),
           15.verticalSpace,

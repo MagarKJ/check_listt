@@ -278,7 +278,16 @@ class _CheckListItem extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Text(checkListItem.name, style: const TextStyle(fontSize: 16)),
+            Text(
+              checkListItem.name,
+              style: TextStyle(
+                fontSize: 16,
+                decoration: checkListItem.isChecked
+                    ? TextDecoration.lineThrough
+                    : null,
+                decorationThickness: 2,
+              ),
+            ),
             const Spacer(),
             Checkbox.adaptive(
               value: checkListItem.isChecked,
